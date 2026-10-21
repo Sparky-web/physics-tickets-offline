@@ -1,0 +1,5 @@
+(function(root){
+const normalize=s=>s.toLowerCase().replace(/ё/g,'е').normalize('NFKC').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+function rank(tickets,query){const q=normalize(query),words=q.split(/\s+/).filter(Boolean);return tickets.map(t=>{const title=normalize(t.title),body=normalize(t.text);if(!q)return {ticket:t,score:0,source:'title'};if(/^\d+$/.test(q)&&t.number===Number(q))return {ticket:t,score:10000,source:'number'};const hits=words.filter(w=>title.includes(w)).length,bodyHits=words.filter(w=>body.includes(w)).length;let score=0,source='body';if(hits){source='title';score=1000+hits*100+words.filter(w=>title.split(' ').includes(w)).length*15;if(title===q)score+=1000;else if(title.startsWith(q))score+=500;else if(title.includes(q))score+=300;if(hits===words.length)score+=200;}else if(bodyHits){score=bodyHits*10+(body.includes(q)?15:0);}return {ticket:t,score,source};}).filter(x=>!q||x.score>0).sort((a,b)=>b.score-a.score||a.ticket.id-b.ticket.id)}
+root.ExamSearch={normalize,rank};
+})(globalThis);
