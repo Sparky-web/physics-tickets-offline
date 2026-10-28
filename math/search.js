@@ -33,6 +33,7 @@ function match(word,text,tokens){
 }
 function rank(tickets,query){
  const q=normalize(query),words=[...new Set(q.split(/\s+/).filter(Boolean))];
+ if(/^\d+\.\d+$/.test(query.trim())){const exact=tickets.filter(t=>normalize(String(t.number))===q);if(exact.length)return exact.map(ticket=>({ticket,score:10000000,source:'number'}));}
  return tickets.map(t=>{
   const p=prepare(t);
   if(!q)return {ticket:t,score:0,source:'title'};
